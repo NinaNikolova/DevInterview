@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Interview.Data;
 using Interview.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Interview.Controllers
 {
@@ -25,6 +26,20 @@ namespace Interview.Controllers
               return _context.Item != null ? 
                           View(await _context.Item.ToListAsync()) :
                           Problem("Entity set 'ApplicationDbContext.Item'  is null.");
+        }
+
+        // GET: Items/ShowSearchForm
+        public async Task<IActionResult> ShowSearchForm()
+        {
+            return _context.Item != null ?
+                        View() :
+                        Problem("Entity set 'ApplicationDbContext.Item'  is null.");
+        }
+
+        // POST: Items/ShowSearchResults
+        public async Task<IActionResult> ShowSearchResults(String SearchPhrase)
+        {
+            return View("Index", await _context.Item.Where(i=> i.ItemQuestion.Contains(SearchPhrase)).ToListAsync());
         }
 
         // GET: Items/Details/5
@@ -46,6 +61,7 @@ namespace Interview.Controllers
         }
 
         // GET: Items/Create
+        [Authorize]
         public IActionResult Create()
         {
             return View();
@@ -54,6 +70,7 @@ namespace Interview.Controllers
         // POST: Items/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,ItemQuestion,ItemAnswer")] Item item)
@@ -68,6 +85,7 @@ namespace Interview.Controllers
         }
 
         // GET: Items/Edit/5
+        [Authorize]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null || _context.Item == null)
@@ -86,6 +104,7 @@ namespace Interview.Controllers
         // POST: Items/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,ItemQuestion,ItemAnswer")] Item item)
@@ -119,6 +138,7 @@ namespace Interview.Controllers
         }
 
         // GET: Items/Delete/5
+        [Authorize]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null || _context.Item == null)
@@ -139,6 +159,7 @@ namespace Interview.Controllers
         // POST: Items/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             if (_context.Item == null)
